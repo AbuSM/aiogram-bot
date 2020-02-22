@@ -1,0 +1,48 @@
+# Russian translations for PROJECT.
+# Copyright (C) 2020 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-02-22 18:09+0500\n"
+"PO-Revision-Date: 2020-02-22 16:57+0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: main.py:53
+msgid "Hi, I'm just a test bot and who are you?"
+msgstr ""
+
+#: main.py:59
+msgid "Your current language: <i>{language}</i>"
+msgstr ""
+
+#: main.py:94
+msgid "We all live in Tajikistan"
+msgstr "Мы все живем в Таджикистане"
+
+#: main.py:100
+msgid "Please type a city name!"
+msgstr ""
+
+#: main.py:109
+msgid "Nothing found("
+msgstr "Ничего не найдено"
+
+#: main.py:140
+msgid "I don't know this message"
+msgstr "Я не знаю это сообщение"
+
+#~ msgid "Hi, I'm just a test bot"
+#~ msgstr "Привет, я простой тестовый бот"
+
