@@ -5,14 +5,10 @@ It echoes any incoming text messages.
 
 import logging
 import sys
-import hashlib
 import re
 
-from typing import List
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.middlewares.i18n import I18nMiddleware
-from aiogram.types import InlineQuery, \
-    InputTextMessageContent, InlineQueryResultArticle, Update, KeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -62,6 +58,7 @@ async def send_welcome(message: types.Message, *args):
     """
     This handler will be called when user sends `/start` command
     """
+    logging.debug('Welcome message: ', message.text)
     await message.answer(_("Hi, I'm just a test bot, nice to meet you {}!\nType /help for more commands".format(message.chat.full_name)))
 
 
@@ -82,7 +79,6 @@ async def send_help(message: types.Message):
 
 @dp.message_handler(commands='lang')
 async def cmd_lang(message: types.Message, locale):
-    # For setting custom lang you have to modify i18n middleware
     await message.reply(_('Your current language: {}').format(hitalic(locale)))
 
 
@@ -95,7 +91,6 @@ async def set_lang(message: types.Message):
 @dp.message_handler(state=Form.lang)
 async def process_lang(message: types.Message, state: FSMContext, *args):
     async with state.proxy() as data:
-        print('args: ', args)
         lang = message.text
         if re.match('(en|tg|ru)', lang):
             data['lang'] = lang
@@ -116,22 +111,8 @@ async def cancel_handler(message: types.Message, state: FSMContext):
         return
 
     logging.info('Cancelling state %r', current_state)
-    # Cancel state and inform user about it
     await state.finish()
-    # And remove keyboard (just in case)
     await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
-
-
-# @dp.message_handler(state=Form.name)
-# async def process_name(message: types.Message, state: FSMContext):
-#     """
-#     Process user name
-#     """
-#     async with state.proxy() as data:
-#         data['name'] = message.text
-#
-#     await message.answer("Nice to meet you, {}!".format(data['name']))
-#     await state.finish()
 
 
 @dp.message_handler(regexp='(^flag[s]?$|tj[k]?|tajik[is]?|tajikistan|vatan)')
@@ -200,9 +181,7 @@ async def process_search(message: types.Message, state: FSMContext):
 
 @dp.message_handler(regexp='')
 async def _reply(message: types.Message):
-    updates: List[Update] = await bot.get_updates()
-    for m in updates:
-        print('Message: ', m.message.text)
+    logging.info('Wrong input: ', message.text)
     await message.reply(_("I don't know this message"))
 
 
@@ -210,26 +189,6 @@ async def _reply(message: types.Message):
 async def check_language(message: types.Message):
     locale = message.from_user.locale
     print('User locale: ', locale)
-
-
-@dp.inline_handler()
-async def inline_echo(inline_query: InlineQuery):
-    # id affects both preview and content,
-    # so it has to be unique for each result
-    # (Unique identifier for this result, 1-64 Bytes)
-    # you can set your unique id's
-    # but for example i'll generate it based on text because I know, that
-    # only text will be passed in this example
-    text = inline_query.query or 'echo'
-    input_content = InputTextMessageContent(text)
-    result_id: str = hashlib.md5(text.encode()).hexdigest()
-    item = InlineQueryResultArticle(
-        id=result_id,
-        title=f'Result {text!r}',
-        input_message_content=input_content,
-    )
-    # don't forget to set cache_time=1 for testing (default is 300s or 5m)
-    await bot.answer_inline_query(inline_query.id, results=[item], cache_time=1)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
