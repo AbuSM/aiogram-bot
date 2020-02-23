@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-02-22 18:09+0500\n"
+"POT-Creation-Date: 2020-02-23 16:38+0500\n"
 "PO-Revision-Date: 2020-02-22 16:57+0500\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,30 +18,108 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.7.0\n"
 
-#: main.py:53
-msgid "Hi, I'm just a test bot and who are you?"
+#: main.py:65
+msgid ""
+"Hi, I'm just a test bot, nice to meet you {}!\n"
+"Type /help for more commands"
 msgstr ""
 
-#: main.py:59
-msgid "Your current language: <i>{language}</i>"
+#: main.py:71
+msgid "Here you can read the list of my commands:"
 msgstr ""
 
-#: main.py:94
+#: main.py:72
+msgid "{command} - Start bot"
+msgstr ""
+
+#: main.py:73
+msgid "{command} - Get this message"
+msgstr ""
+
+#: main.py:74
+msgid "{command} - Get weather of city"
+msgstr ""
+
+#: main.py:75
+msgid "{command} - Search a word in local dictionary"
+msgstr ""
+
+#: main.py:76
+msgid "{command} - My language"
+msgstr ""
+
+#: main.py:77
+msgid "{command} - Change language"
+msgstr ""
+
+#: main.py:86
+msgid "Your current language: {}"
+msgstr ""
+
+#: main.py:102
+msgid "Language switched to {}"
+msgstr ""
+
+#: main.py:106
+msgid ""
+"This type of locale doesn't support!\n"
+"Please type one of: en, ru, tg"
+msgstr ""
+
+#: main.py:141
 msgid "We all live in Tajikistan"
 msgstr ""
 
-#: main.py:100
+#: main.py:147
 msgid "Please type a city name!"
 msgstr ""
 
-#: main.py:109
+#: main.py:156 main.py:198
 msgid "Nothing found("
 msgstr ""
 
-#: main.py:140
+#: main.py:166
+msgid "Temperature: {}"
+msgstr ""
+
+#: main.py:167
+msgid "Minimum temp: {}"
+msgstr ""
+
+#: main.py:168
+msgid "Maximum temp: {}"
+msgstr ""
+
+#: main.py:169
+msgid "Feels like: {}"
+msgstr ""
+
+#: main.py:170
+msgid "Pressure: {}"
+msgstr ""
+
+#: main.py:171
+msgid "Humidity: {}"
+msgstr ""
+
+#: main.py:185
+msgid "Type a word you want to search!"
+msgstr ""
+
+#: main.py:196
+msgid "I've found {} in dictionary!"
+msgstr ""
+
+#: main.py:207
 msgid "I don't know this message"
 msgstr ""
 
 #~ msgid "Hi, I'm just a test bot"
+#~ msgstr ""
+
+#~ msgid "Hi, I'm just a test bot and who are you?"
+#~ msgstr ""
+
+#~ msgid "Your current language: <i>{language}</i>"
 #~ msgstr ""
 

@@ -6,16 +6,19 @@ It echoes any incoming text messages.
 import logging
 import sys
 import hashlib
+import re
 
+from typing import List
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.middlewares.i18n import I18nMiddleware
 from aiogram.types import InlineQuery, \
-    InputTextMessageContent, InlineQueryResultArticle
+    InputTextMessageContent, InlineQueryResultArticle, Update, KeyboardButton
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from lib.weather import Weather
+from aiogram.utils.markdown import hbold, hitalic
 
 API_TOKEN = '784847496:AAEMdIue3F7YIRl7GDcTX-Di--63we_0q4w'
 bot = Bot(token=API_TOKEN, parse_mode=types.ParseMode.HTML)
@@ -37,26 +40,69 @@ dp.middleware.setup(i18n)
 
 _ = i18n.gettext
 
+dictionary = [
+    "mobile",
+    "hello",
+    "city",
+    "message",
+    "word",
+    "people",
+    "person"
+]
+
 
 class Form(StatesGroup):
     city = State()
-    name = State()
+    search = State()
+    lang = State()
 
 
-@dp.message_handler(commands=['start', 'help'])
-async def send_welcome(message: types.Message, locale):
+@dp.message_handler(commands=['start'])
+async def send_welcome(message: types.Message, *args):
     """
-    This handler will be called when user sends `/start` or `/help` command
+    This handler will be called when user sends `/start` command
     """
-    await Form.name.set()
+    await message.answer(_("Hi, I'm just a test bot, nice to meet you {}!\nType /help for more commands".format(message.chat.full_name)))
 
-    await message.reply(_("Hi, I'm just a test bot and who are you?"))
+
+@dp.message_handler(commands=['help'])
+async def send_help(message: types.Message):
+    text = [
+        hbold(_("Here you can read the list of my commands:")),
+        _("{command} - Start bot").format(command="/start"),
+        _("{command} - Get this message").format(command="/help"),
+        _("{command} - Get weather of city").format(command="/weather"),
+        _("{command} - Search a word in local dictionary").format(command="/search"),
+        _("{command} - My language").format(command="/lang"),
+        _("{command} - Change language").format(command="/setlang"),
+        "",
+    ]
+    await message.answer("\n".join(text))
 
 
 @dp.message_handler(commands='lang')
 async def cmd_lang(message: types.Message, locale):
     # For setting custom lang you have to modify i18n middleware
-    await message.reply(_('Your current language: <i>{language}</i>').format(language=locale))
+    await message.reply(_('Your current language: {}').format(hitalic(locale)))
+
+
+@dp.message_handler(commands='setlang')
+async def set_lang(message: types.Message):
+    await Form.lang.set()
+    await message.answer('Type locale to switch (Ex: tg - for tajik, ru - russian, en - english)!')
+
+
+@dp.message_handler(state=Form.lang)
+async def process_lang(message: types.Message, state: FSMContext, *args):
+    async with state.proxy() as data:
+        print('args: ', args)
+        lang = message.text
+        if re.match('(en|tg|ru)', lang):
+            data['lang'] = lang
+            await message.answer(_("Language switched to {}".format(hbold(lang))))
+            await state.finish()
+        else:
+            await message.answer(_("This type of locale doesn't support!\nPlease type one of: en, ru, tg"))
 
 
 @dp.message_handler(state='*', commands='cancel')
@@ -76,16 +122,16 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
 
-@dp.message_handler(state=Form.name)
-async def process_name(message: types.Message, state: FSMContext):
-    """
-    Process user name
-    """
-    async with state.proxy() as data:
-        data['name'] = message.text
-
-    await message.answer("Nice to meet you, {}!".format(data['name']))
-    await state.finish()
+# @dp.message_handler(state=Form.name)
+# async def process_name(message: types.Message, state: FSMContext):
+#     """
+#     Process user name
+#     """
+#     async with state.proxy() as data:
+#         data['name'] = message.text
+#
+#     await message.answer("Nice to meet you, {}!".format(data['name']))
+#     await state.finish()
 
 
 @dp.message_handler(regexp='(^flag[s]?$|tj[k]?|tajik[is]?|tajikistan|vatan)')
@@ -115,13 +161,15 @@ async def process_weather(message: types.Message, state: FSMContext):
         pressure = str(weather.get('pressure', '-')) + 'hPa'
         humidity = str(weather.get('humidity', '-')) + '%'
         feels_like = str(weather.get('feels_like', '-'))
-        text =  "<b>Temperature:</b> {} \n" \
-                "<b>Minimum temp</b>: {} \n" \
-                "<b>Maximum temp</b>: {} \n" \
-                "<b>Feels like</b>: {} \n" \
-                "<b>Pressure</b>: {} \n" \
-                "<b>Humidity</b>: {} \n".format(temp, temp_min, temp_max, feels_like, pressure, humidity)
-    await message.answer(text)
+        text = [
+            _("Temperature: {}").format(temp),
+            _("Minimum temp: {}").format(temp_min),
+            _("Maximum temp: {}").format(temp_max),
+            _("Feels like: {}").format(feels_like),
+            _("Pressure: {}").format(pressure),
+            _("Humidity: {}").format(humidity)
+        ]
+    await message.answer("\n".join(text))
     await state.finish()
 
 
@@ -131,12 +179,30 @@ async def send_logs(message: types.Message):
 
 
 @dp.message_handler(commands=['search'])
-async def send_search_results(message: types.Message):
-    pass
+async def send_search(message: types.Message):
+    await Form.search.set()
+    await message.answer(_('Type a word you want to search!'))
+
+
+@dp.message_handler(state=Form.search)
+async def process_search(message: types.Message, state: FSMContext):
+    text = message.text
+    founded = []
+    for _str in dictionary:
+        if _str.find(text) > -1:
+            founded.append(_str)
+    if len(founded):
+        await message.answer(_("I've found {} in dictionary!").format(hbold(', '.join(founded))))
+    else:
+        await message.answer(_("Nothing found("))
+    await state.finish()
 
 
 @dp.message_handler(regexp='')
 async def _reply(message: types.Message):
+    updates: List[Update] = await bot.get_updates()
+    for m in updates:
+        print('Message: ', m.message.text)
     await message.reply(_("I don't know this message"))
 
 
